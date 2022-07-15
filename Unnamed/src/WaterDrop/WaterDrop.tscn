@@ -1,0 +1,83 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://src/Flame/firegradient.tres" type="Texture" id=1]
+[ext_resource path="res://src/OilDrop/OilDrop.gd" type="Script" id=2]
+[ext_resource path="res://assets/water_drops.png" type="Texture" id=3]
+[ext_resource path="res://src/Hitbox/Hitbox.tscn" type="PackedScene" id=4]
+
+[sub_resource type="Animation" id=1]
+resource_name = "spin"
+length = 0.64
+loop = true
+step = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.18, 0.32, 0.48, 0.64 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0.0, 90.0, 180.0, 270.0, 360.0 ]
+}
+
+[sub_resource type="ParticlesMaterial" id=2]
+emission_shape = 1
+emission_sphere_radius = 1.2
+flag_disable_z = true
+direction = Vector3( 0, -1, 0 )
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 8.0
+initial_velocity_random = 0.4
+angular_velocity = 30.0
+angular_velocity_random = 1.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel = 4.0
+linear_accel_random = 0.1
+angle = 360.0
+angle_random = 1.0
+color_ramp = ExtResource( 1 )
+
+[sub_resource type="CircleShape2D" id=3]
+radius = 2.0
+
+[node name="WaterDrop" type="Node2D"]
+script = ExtResource( 2 )
+velocity = Vector2( 0, 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, 8 )
+texture = ExtResource( 3 )
+offset = Vector2( 0, -14 )
+hframes = 8
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/spin = SubResource( 1 )
+
+[node name="Particles2D" type="Particles2D" parent="."]
+visible = false
+amount = 20
+lifetime = 0.5
+randomness = 1.0
+fixed_fps = 24
+local_coords = false
+process_material = SubResource( 2 )
+
+[node name="VisibilityNotifier2D" type="VisibilityNotifier2D" parent="."]
+scale = Vector2( 0.487889, 0.202252 )
+rect = Rect2( -4, -10, 8, 18 )
+
+[node name="Hitbox" parent="." instance=ExtResource( 4 )]
+collision_mask = 6
+damage = 10
+
+[node name="Collider" parent="Hitbox" index="0"]
+shape = SubResource( 3 )
+
+[connection signal="area_entered" from="Hitbox" to="." method="_on_Hitbox_area_entered"]
+[connection signal="body_entered" from="Hitbox" to="." method="_on_Hitbox_body_entered"]
+
+[editable path="Hitbox"]

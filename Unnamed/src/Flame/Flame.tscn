@@ -1,0 +1,98 @@
+[gd_scene load_steps=12 format=2]
+
+[ext_resource path="res://src/Flame/Flame.gd" type="Script" id=1]
+[ext_resource path="res://src/Flame/100hp_core.tres" type="Material" id=2]
+[ext_resource path="res://src/Flame/100hp_base.tres" type="Material" id=3]
+[ext_resource path="res://assets/player_eyes.png" type="Texture" id=5]
+
+[sub_resource type="ShaderMaterial" id=1]
+
+[sub_resource type="CanvasItemMaterial" id=2]
+light_mode = 1
+particles_animation = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 1
+particles_anim_loop = true
+
+[sub_resource type="StreamTexture" id=3]
+load_path = "res://.import/flame_base.png-1c8ea438bf7307d6d87102f7a04c4a02.stex"
+
+[sub_resource type="CanvasItemMaterial" id=4]
+particles_animation = true
+particles_anim_h_frames = 4
+particles_anim_v_frames = 1
+particles_anim_loop = true
+
+[sub_resource type="StreamTexture" id=5]
+load_path = "res://.import/flame_core.png-6d391849ce55f9a02ccd5b96b17d2970.stex"
+
+[sub_resource type="Animation" id=6]
+length = 3.5
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("EyesSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 3, 3.1, 3.2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 1,
+"values": [ 0, 0, 1, 2 ]
+}
+
+[sub_resource type="RectangleShape2D" id=7]
+extents = Vector2( 6.948, 11.2332 )
+
+[node name="Flame" type="Node2D"]
+material = SubResource( 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="ParticlesBase" type="Particles2D" parent="."]
+material = SubResource( 2 )
+position = Vector2( 0, -8 )
+amount = 20
+lifetime = 0.5
+randomness = 1.0
+fixed_fps = 24
+local_coords = false
+process_material = ExtResource( 3 )
+texture = SubResource( 3 )
+
+[node name="ParticlesCore" type="Particles2D" parent="."]
+material = SubResource( 4 )
+position = Vector2( 0, -8 )
+amount = 20
+lifetime = 0.5
+randomness = 0.8
+fixed_fps = 24
+local_coords = false
+process_material = ExtResource( 2 )
+texture = SubResource( 5 )
+
+[node name="Label" type="Label" parent="."]
+visible = false
+margin_left = -15.0
+margin_top = -33.0
+margin_right = 17.0
+margin_bottom = -19.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SpriteAnimator" type="AnimationPlayer" parent="."]
+anims/idle = SubResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( -0.471939, -11.0905 )
+shape = SubResource( 7 )
+
+[node name="EyesSprite" type="Sprite" parent="."]
+position = Vector2( 0, -9 )
+texture = ExtResource( 5 )
+hframes = 3
+frame = 1

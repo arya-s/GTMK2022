@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/flame_going_out.mp3-1ec493785f74f98a9100e7ce45b7363e.mp3str"
+
+[deps]
+
+source_file="res://assets/flame_going_out.mp3"
+dest_files=[ "res://.import/flame_going_out.mp3-1ec493785f74f98a9100e7ce45b7363e.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

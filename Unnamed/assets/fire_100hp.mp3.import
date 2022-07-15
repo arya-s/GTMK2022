@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/fire_100hp.mp3-f858f8590dafa5bb0105bafcf89ac7f0.mp3str"
+
+[deps]
+
+source_file="res://assets/fire_100hp.mp3"
+dest_files=[ "res://.import/fire_100hp.mp3-f858f8590dafa5bb0105bafcf89ac7f0.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0

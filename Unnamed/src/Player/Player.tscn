@@ -1,0 +1,212 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://assets/fire_100hp.mp3" type="AudioStream" id=1]
+[ext_resource path="res://src/Player/Player.gd" type="Script" id=2]
+[ext_resource path="res://src/Flame/Flame.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/fire_jump.mp3" type="AudioStream" id=4]
+[ext_resource path="res://assets/consume.mp3" type="AudioStream" id=5]
+[ext_resource path="res://src/Camera/Camera.tscn" type="PackedScene" id=6]
+[ext_resource path="res://src/Hurtbox/Hurtbox.tscn" type="PackedScene" id=7]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 3, 7 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 1, 8 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 1, 8 )
+
+[sub_resource type="Animation" id=4]
+resource_name = "low_hp"
+length = 0.2
+tracks/0/type = "method"
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [  ],
+"method": "animate_hit"
+}, {
+"args": [  ],
+"method": "reset_flame_color"
+} ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "hit"
+length = 0.9
+tracks/0/type = "method"
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ),
+"values": [ {
+"args": [  ],
+"method": "animate_hit"
+}, {
+"args": [  ],
+"method": "reset_flame_color"
+}, {
+"args": [  ],
+"method": "animate_hit"
+}, {
+"args": [  ],
+"method": "reset_flame_color"
+}, {
+"args": [  ],
+"method": "animate_hit"
+}, {
+"args": [  ],
+"method": "reset_flame_color"
+}, {
+"args": [  ],
+"method": "animate_hit"
+}, {
+"args": [  ],
+"method": "reset_flame_color"
+}, {
+"args": [  ],
+"method": "animate_hit"
+}, {
+"args": [  ],
+"method": "reset_flame_color"
+} ]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.9 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [ true ],
+"method": "set_invincible"
+}, {
+"args": [ false ],
+"method": "set_invincible"
+} ]
+}
+
+[node name="Player" type="KinematicBody2D" groups=[
+"player",
+]]
+script = ExtResource( 2 )
+
+[node name="Camera" parent="." instance=ExtResource( 6 )]
+
+[node name="DebugLabel" type="Label" parent="."]
+margin_left = -20.106
+margin_top = -35.7904
+margin_right = 19.894
+margin_bottom = -21.7904
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Collider" type="CollisionShape2D" parent="." groups=[
+"player",
+]]
+position = Vector2( 0, -7 )
+shape = SubResource( 1 )
+
+[node name="Flame" parent="." instance=ExtResource( 3 )]
+material = null
+
+[node name="RightWallRayCast" type="RayCast2D" parent="."]
+position = Vector2( 3, -7 )
+enabled = true
+cast_to = Vector2( 6, 0 )
+collision_mask = 2
+
+[node name="LeftWallRayCast" type="RayCast2D" parent="."]
+position = Vector2( -3, -7 )
+enabled = true
+cast_to = Vector2( -6, 0 )
+collision_mask = 2
+
+[node name="ShootingPosition" type="Position2D" parent="."]
+position = Vector2( 3, -7 )
+
+[node name="RoomDetectorLeft" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomDetectorLeft"]
+position = Vector2( 6, -8 )
+shape = SubResource( 2 )
+
+[node name="RoomDetectorRight" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomDetectorRight"]
+position = Vector2( -6, -8 )
+shape = SubResource( 3 )
+
+[node name="Hurtbox" parent="." instance=ExtResource( 7 )]
+collision_layer = 4
+
+[node name="HealthAnimationPlayer" type="AnimationPlayer" parent="."]
+anims/low_hp = SubResource( 4 )
+
+[node name="HitAnimationPlayer" type="AnimationPlayer" parent="."]
+anims/hit = SubResource( 5 )
+
+[node name="JumpSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+volume_db = 16.0
+
+[node name="ConsumeSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )
+volume_db = 8.0
+
+[node name="CracklingSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 1 )
+volume_db = 8.0
+autoplay = true
+
+[node name="ShootingSoundPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="CoyoteJumpTimer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[node name="VariableJumpTimer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="HealthDecayTimer" type="Timer" parent="."]
+process_mode = 0
+autostart = true
+
+[node name="ShootCooldownTimer" type="Timer" parent="."]
+process_mode = 0
+wait_time = 0.25
+one_shot = true
+
+[node name="ShootResetTimer" type="Timer" parent="."]
+
+[node name="DebugRay" type="RayCast2D" parent="."]
+enabled = true
+cast_to = Vector2( 0, -50 )
+
+[connection signal="area_entered" from="RoomDetectorLeft" to="." method="_on_RoomDetectorLeft_area_entered"]
+[connection signal="area_entered" from="RoomDetectorRight" to="." method="_on_RoomDetectorRight_area_entered"]
+[connection signal="body_entered" from="Hurtbox" to="." method="_on_Hurtbox_body_entered"]
+[connection signal="hit" from="Hurtbox" to="." method="_on_Hurtbox_hit"]
+[connection signal="timeout" from="HealthDecayTimer" to="." method="_on_HealthDecayTimer_timeout"]
+
+[editable path="Hurtbox"]

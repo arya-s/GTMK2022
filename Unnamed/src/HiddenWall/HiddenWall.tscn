@@ -1,0 +1,68 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://assets/hidden_wall_front.png" type="Texture" id=1]
+[ext_resource path="res://assets/hidden_wall_middle.png" type="Texture" id=2]
+[ext_resource path="res://assets/hidden_wall_ending.png" type="Texture" id=3]
+[ext_resource path="res://src/Hurtbox/Hurtbox.tscn" type="PackedScene" id=4]
+[ext_resource path="res://src/HiddenWall/HiddenWall.gd" type="Script" id=5]
+[ext_resource path="res://assets/secret_tile.png" type="Texture" id=6]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 3, 3 )
+
+[node name="HiddenWall" type="StaticBody2D"]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource( 5 )
+
+[node name="Front" type="Sprite" parent="."]
+position = Vector2( 24, 16 )
+texture = ExtResource( 1 )
+
+[node name="End" type="Sprite" parent="."]
+position = Vector2( 280, 16 )
+texture = ExtResource( 3 )
+
+[node name="Middle" type="Sprite" parent="."]
+position = Vector2( 72, 16 )
+texture = ExtResource( 2 )
+
+[node name="Middle2" type="Sprite" parent="."]
+position = Vector2( 120, 16 )
+texture = ExtResource( 2 )
+
+[node name="Middle3" type="Sprite" parent="."]
+position = Vector2( 168, 16 )
+texture = ExtResource( 2 )
+
+[node name="Middle4" type="Sprite" parent="."]
+position = Vector2( 216, 16 )
+texture = ExtResource( 2 )
+
+[node name="Middle5" type="Sprite" parent="."]
+position = Vector2( 232, 16 )
+texture = ExtResource( 2 )
+
+[node name="Middle6" type="Sprite" parent="."]
+position = Vector2( 248, 16 )
+texture = ExtResource( 2 )
+
+[node name="SecretTile" type="Sprite" parent="."]
+position = Vector2( 4, 12 )
+texture = ExtResource( 6 )
+
+[node name="Hurtbox" parent="." instance=ExtResource( 4 )]
+collision_layer = 8
+
+[node name="Collider" parent="Hurtbox" index="0"]
+position = Vector2( 4, 12 )
+shape = SubResource( 1 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2( 14, 20 )
+scale = Vector2( 1.4, 2.4 )
+polygon = PoolVector2Array( -10, -5, -10, -8.33333, 7.14286, -8.33333, 7.14286, 8.33333, -10, 8.33333, -10, -1.66667, -4.28571, -1.66667, -4.28571, -1.66667, -4.28571, -5 )
+
+[connection signal="hit" from="Hurtbox" to="." method="_on_Hurtbox_hit"]
+
+[editable path="Hurtbox"]

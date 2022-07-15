@@ -1,0 +1,12 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://src/PlayerStats/PlayerStats.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+MAX_HEALTH = 100
+STARTING_HEALTH = 100
+MAX_FIREBALLS = 2
+FIREBALL_COST = 15
+HEALTH_LOW_THRESHOLD = 8
+HEALTH_CRITICAL_THRESHOLD = 4

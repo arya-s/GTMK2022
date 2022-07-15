@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://src/RoomShape/FullRoomShape.tres" type="Shape2D" id=1]
+
+[node name="RoomShape" type="Area2D"]
+collision_layer = 64
+collision_mask = 0
+
+[node name="Collider" type="CollisionShape2D" parent="."]
+position = Vector2( 160, 90 )
+shape = ExtResource( 1 )

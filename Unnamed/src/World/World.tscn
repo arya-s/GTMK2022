@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://src/World/World.gd" type="Script" id=3]
+
+[node name="World" type="Node"]
+script = ExtResource( 3 )
+starting_level = "res://src/Levels/Level_01.tscn"

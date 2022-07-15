@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/rat_dying.mp3-bb55578198a6897bd3143a3110fa362c.mp3str"
+
+[deps]
+
+source_file="res://assets/rat_dying.mp3"
+dest_files=[ "res://.import/rat_dying.mp3-bb55578198a6897bd3143a3110fa362c.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

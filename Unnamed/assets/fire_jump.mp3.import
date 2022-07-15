@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/fire_jump.mp3-978c133ff394150483998522316393d7.mp3str"
+
+[deps]
+
+source_file="res://assets/fire_jump.mp3"
+dest_files=[ "res://.import/fire_jump.mp3-978c133ff394150483998522316393d7.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

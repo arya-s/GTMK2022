@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://src/LevelTransition/LevelTransition.gd" type="Script" id=1]
+
+[node name="LevelTransition" type="Area2D" groups=[
+"level_transition",
+]]
+collision_layer = 0
+script = ExtResource( 1 )
+
+[node name="Collider" type="CollisionShape2D" parent="."]
+
+[node name="ExitPosition" type="Position2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_LevelTransition_body_entered"]
