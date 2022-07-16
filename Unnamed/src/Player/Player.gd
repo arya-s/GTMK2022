@@ -32,12 +32,6 @@ enum {
 var ALIVE = true
 var facing = NEUTRAL
 var game_instances = GameResourceLoader.game_instances
-var health_to_collider = {
-	100: Vector2(3, 7),
-	75: Vector2(3, 5),
-	50: Vector2(3, 3),
-	25: Vector2(3, 2),
-}
 var invincible = false setget set_invincible
 var is_holding = false
 var just_jumped = false
@@ -45,32 +39,28 @@ var knockback_motion = Vector2.ZERO
 var max_fall = 0
 var motion = Vector2.ZERO
 var player_stats = GameResourceLoader.player_stats
-var shooting_sounds = [
-	preload("res://assets/fireball_1.mp3"),
-	preload("res://assets/fireball_2.mp3"),
-	preload("res://assets/fireball_3.mp3"),
-	preload("res://assets/fireball_4.mp3"),
-]
 var variable_jump_speed = 0
 var wall_speed_retained = 0
 
+var form = -1
+var char_form = 0
+var boost_jumped = false
+var was_in_air = false
+var was_on_floor = false
+
 onready var camera = $Camera
 onready var collider = $Collider
-onready var consume_sound = $ConsumeSound
 onready var coyote_jump_timer = $CoyoteJumpTimer
 onready var debug_label = $DebugLabel
 onready var debug_ray = $DebugRay
-onready var flame = $Flame
-onready var health_animation_player = $HealthAnimationPlayer
 onready var hit_animation_player = $HitAnimationPlayer
 onready var hurtbox_collider = $Hurtbox/Collider
 onready var left_wall_ray_cast = $LeftWallRayCast
 onready var jump_sound = $JumpSound
 onready var right_wall_ray_cast = $RightWallRayCast
-onready var shoot_cooldown_timer = $ShootCooldownTimer
-onready var shooting_position = $ShootingPosition
-onready var shooting_sound_player = $ShootingSoundPlayer
+onready var sprite = $Sprite
 onready var variable_jump_timer = $VariableJumpTimer
+onready var change_form_timer = $ChangeFormTimer
 
 signal touched_level_transition(level_transition)
 signal boss_died
@@ -80,9 +70,7 @@ func _exit_tree():
 
 func _ready():
 	reset()
-	shooting_sounds.shuffle()
 	
-	flame.set_health(player_stats.health)
 	player_stats.connect("player_died", self, "_on_died")
 	game_instances.player = self
 	
@@ -101,6 +89,7 @@ func _ready():
 
 func _physics_process(delta):
 	just_jumped = false
+	boost_jumped = false
 
 	var input_vector = get_input_vector()
 	var direction = sign(input_vector.x)
@@ -109,33 +98,30 @@ func _physics_process(delta):
 		facing = direction
 	
 	apply_horizontal_force(input_vector, delta)
+	handle_collisions(input_vector)
 	jump_check(input_vector)
 	apply_gravity(delta)
 	update_animations(input_vector)
 	move()
-	handle_collisions()
 	handle_additional_input()
-	update_shooting_position()
 	
 	# Kill the player dark souls style if we fall below the level
 	if global_position.y > 220:
 		die()
 
 func _process(delta):
-	if player_stats.health < player_stats.HEALTH_CRITICAL_THRESHOLD:
-		health_animation_player.play("low_hp")
+	pass
 
 func animate_hit():
 	Controls.rumble_gamepad(Controls.RumbleStrength.Light, Controls.RumbleLength.VeryShort)
-	flame.flash_color()
 
 func apply_gravity(delta: float):
 	max_fall = move_toward(max_fall, MAX_FALL, FAST_MAX_ACCEL * delta)
-	var mult = 0.5 if abs(motion.y) < HALF_GRAVITY_THRESHOLD and Input.is_action_pressed("jump") else 1.0
+	var mult = 0.5 if abs(motion.y) < HALF_GRAVITY_THRESHOLD and not boost_jumped and Input.is_action_pressed("jump") else 1.0
 	motion.y = move_toward(motion.y, max_fall, GRAVITY * mult * delta)
 	
 	if (variable_jump_timer.time_left > 0):
-		if Input.is_action_pressed("jump"):
+		if Input.is_action_pressed("jump") and not boost_jumped:
 			motion.y = min(motion.y, variable_jump_speed)
 		else:
 			variable_jump_timer.stop()
@@ -147,8 +133,6 @@ func apply_horizontal_force(input_vector: Vector2, delta: float):
 		motion.x = move_toward(motion.x, input_vector.x * MAX_SPEED, FRICTION * mult * delta)
 	else:
 		motion.x = move_toward(motion.x, input_vector.x * MAX_SPEED, ACCELERATION * mult * delta)
-	# Offset flame particles so that they better match the collision box
-	flame.move_x(motion.x * facing * 4 * delta)
 
 func die():	
 	Global.play_player_dying_sound()
@@ -173,44 +157,41 @@ func get_input_vector():
 	
 	return input_vector
 
-func heal(amount: int):
-	if amount > 0:
-		reset()
-	
-	player_stats.health += amount
-	update_flame_health()
-
-func hit(damage: int):
-	hit_animation_player.play("hit")
-	Global.play_player_hit_sound()
-	player_stats.health -= damage
-	update_flame_health()
-
 func handle_additional_input():
-	if (player_stats.health > player_stats.HEALTH_LOW_THRESHOLD and
-	   Input.is_action_pressed("shoot") and
-	   player_stats.fireballs < player_stats.MAX_FIREBALLS and 
-	   shoot_cooldown_timer.time_left == 0):
-		shoot_fireball()
+	if Input.is_action_just_pressed("change_form"):
+		change_form_timer.start()
+		form = (form + 1) % 3
+		char_form = form
+		sprite.frame = char_form
+		
 
-func handle_collisions():
+func handle_collisions(input_vector: Vector2):
 	# Relies on speicifically using move_and_slide or mmove_and_slide_with_snap
-	for i in get_slide_count():
-		var collider = get_slide_collision(i).collider
-		var groups = collider.get_groups()
+#	for i in get_slide_count():
+#		var collider = get_slide_collision(i).collider
+#		var groups = collider.get_groups()
+	var plat = get_collided_platform()
 
-func jump(input_vector: Vector2, force: int):
+	if plat == char_form and not was_on_floor and is_on_floor():
+		jump(input_vector, JUMP_FORCE*4, JUMP_HORIZONTAL_BOOST*2.5)
+		boost_jumped = true
+		just_jumped = true
+
+func jump(input_vector: Vector2, force: int, horizontal_force: int):
 	variable_jump_timer.start()
-	motion.x += input_vector.x * JUMP_HORIZONTAL_BOOST
+	motion.x += input_vector.x * horizontal_force
 	motion.y = -force
 	variable_jump_speed = motion.y
 	
 	jump_sound.play()
 	
 func jump_check(input_vector: Vector2):
+	if boost_jumped:
+		return
+
 	if Input.is_action_just_pressed("jump"):
 		if is_on_floor() or coyote_jump_timer.time_left > 0:
-			jump(input_vector, JUMP_FORCE)
+			jump(input_vector, JUMP_FORCE, JUMP_HORIZONTAL_BOOST)
 			just_jumped = true
 		else:
 			if wall_jump_check(RIGHT):
@@ -223,8 +204,8 @@ func jump_check(input_vector: Vector2):
 		motion.y = -JUMP_FORCE / 2.0
 
 func move():
-	var was_in_air = not is_on_floor()
-	var was_on_floor = is_on_floor()
+	was_in_air = not is_on_floor()
+	was_on_floor = is_on_floor()
 	
 	# by supplying the normal of the surface we can automatically
 	# detect when the character is on floor using
@@ -238,48 +219,24 @@ func move():
 	
 	# just left ground
 	if was_on_floor and not is_on_floor() and not just_jumped:
-		motion.y = 0
+#		motion.y = 0
 		coyote_jump_timer.start()
-
-func play_consume_sound():
-	consume_sound.play()
-
-func play_shooting_sound():
-	var sound = shooting_sounds[randi() % shooting_sounds.size()]
-	shooting_sound_player.stream = sound
-	shooting_sound_player.play()
 
 func reset():
 	hit_animation_player.stop()
-	reset_flame_color()
 	invincible = false
-
-func reset_flame_color():
-	flame.reset_color()
 
 func set_invincible(value: bool):
 	invincible = value
 
-func shoot_fireball():
-	play_shooting_sound()
-	Controls.rumble_gamepad(Controls.RumbleStrength.Medium, Controls.RumbleLength.VeryShort)
-	
-	player_stats.fireballs += 1
-	shoot_cooldown_timer.start()
-	
-	var fireball = Utils.instance_scene_on_main(Fireball, shooting_position.global_position)
-	fireball.move_in_direction(flame.scale.x)
-	fireball.connect("fireball_vanished", self, "freeup_fireball")
-	
-	heal(-player_stats.FIREBALL_COST)
-
 func update_animations(input_vector: Vector2):
-	flame.scale.x = facing
+	sprite.scale.x = facing
 	if input_vector.x != 0:
 		pass
 		#animate("run")
 	else:
-		flame.play_idle_animation()
+		# idle
+		pass
 		
 	# air
 	if not is_on_floor():
@@ -312,24 +269,6 @@ func update_collider(extents):
 		hurtbox_collider.shape = hurtbox_shape
 		hurtbox_collider.position = Vector2(0, -extents.y)
 
-func update_collider_for_health():
-	if player_stats.health > 75:
-		update_collider(health_to_collider[100])
-	elif player_stats.health > 50:
-		update_collider(health_to_collider[75])
-	elif player_stats.health > 25:
-		update_collider(health_to_collider[50])
-	else:
-		update_collider(health_to_collider[25])
-
-func update_flame_health():
-	update_collider_for_health()
-	flame.set_health(player_stats.health)
-
-func update_shooting_position():
-	var extents = collider.shape.extents
-	shooting_position.position = Vector2(extents.x * flame.scale.x, -extents.y/2 - 2)
-
 func wall_jump(dir: int, force: int):
 	variable_jump_timer.start()
 	motion.x = dir * WALL_JUMP_HORIZONTAL_SPEED
@@ -349,9 +288,6 @@ func wall_jump_check(dir: int):
 func _on_died():
 	die()
 	
-func _on_HealthDecayTimer_timeout():
-	heal(-1)
-
 func knockback(direction):
 	var knockback_motion = (direction * KNOCKBACK_FORCE).rotated(deg2rad(45 if direction.x < 0 else 325))
 	knockback_motion.y = min(knockback_motion.y, -200)
@@ -359,10 +295,7 @@ func knockback(direction):
 	debug_ray.cast_to = knockback_motion
 
 func _on_Hurtbox_hit(damage, attacker):
-	if not invincible:
-		var direction = global_position.direction_to(attacker.global_position)
-		knockback(-direction)
-		hit(damage)
+	pass
 
 func _on_RoomDetectorLeft_area_entered(room: Area2D):
 	update_camera(room)
@@ -370,3 +303,17 @@ func _on_RoomDetectorLeft_area_entered(room: Area2D):
 func _on_RoomDetectorRight_area_entered(room: Area2D):
 	update_camera(room)
 
+func _on_ChangeFormTimer_timeout():
+	form = -1
+	
+func get_collided_platform():
+	for i in range(get_slide_count()):
+		var collision = get_slide_collision(i)
+		if collision.collider.is_in_group('jump_platforms'):
+			if collision.collider.is_in_group('plat_1'):
+				return 0
+			if collision.collider.is_in_group('plat_2'):
+				return 1
+			if collision.collider.is_in_group('plat_3'):
+				return 2
+	return null

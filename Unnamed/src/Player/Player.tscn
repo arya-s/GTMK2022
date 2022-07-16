@@ -1,10 +1,8 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=11 format=2]
 
-[ext_resource path="res://assets/fire_100hp.mp3" type="AudioStream" id=1]
 [ext_resource path="res://src/Player/Player.gd" type="Script" id=2]
-[ext_resource path="res://src/Flame/Flame.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/player_proto_1.png" type="Texture" id=3]
 [ext_resource path="res://assets/fire_jump.mp3" type="AudioStream" id=4]
-[ext_resource path="res://assets/consume.mp3" type="AudioStream" id=5]
 [ext_resource path="res://src/Camera/Camera.tscn" type="PackedScene" id=6]
 [ext_resource path="res://src/Hurtbox/Hurtbox.tscn" type="PackedScene" id=7]
 
@@ -122,8 +120,10 @@ __meta__ = {
 position = Vector2( 0, -7 )
 shape = SubResource( 1 )
 
-[node name="Flame" parent="." instance=ExtResource( 3 )]
-material = null
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, -16 )
+texture = ExtResource( 3 )
+hframes = 3
 
 [node name="RightWallRayCast" type="RayCast2D" parent="."]
 position = Vector2( 3, -7 )
@@ -169,17 +169,6 @@ anims/hit = SubResource( 5 )
 stream = ExtResource( 4 )
 volume_db = 16.0
 
-[node name="ConsumeSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 5 )
-volume_db = 8.0
-
-[node name="CracklingSound" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource( 1 )
-volume_db = 8.0
-autoplay = true
-
-[node name="ShootingSoundPlayer" type="AudioStreamPlayer" parent="."]
-
 [node name="CoyoteJumpTimer" type="Timer" parent="."]
 wait_time = 0.1
 one_shot = true
@@ -188,16 +177,8 @@ one_shot = true
 wait_time = 0.2
 one_shot = true
 
-[node name="HealthDecayTimer" type="Timer" parent="."]
-process_mode = 0
-autostart = true
-
-[node name="ShootCooldownTimer" type="Timer" parent="."]
-process_mode = 0
-wait_time = 0.25
-one_shot = true
-
-[node name="ShootResetTimer" type="Timer" parent="."]
+[node name="ChangeFormTimer" type="Timer" parent="."]
+wait_time = 0.4
 
 [node name="DebugRay" type="RayCast2D" parent="."]
 enabled = true
@@ -207,6 +188,6 @@ cast_to = Vector2( 0, -50 )
 [connection signal="area_entered" from="RoomDetectorRight" to="." method="_on_RoomDetectorRight_area_entered"]
 [connection signal="body_entered" from="Hurtbox" to="." method="_on_Hurtbox_body_entered"]
 [connection signal="hit" from="Hurtbox" to="." method="_on_Hurtbox_hit"]
-[connection signal="timeout" from="HealthDecayTimer" to="." method="_on_HealthDecayTimer_timeout"]
+[connection signal="timeout" from="ChangeFormTimer" to="." method="_on_ChangeFormTimer_timeout"]
 
 [editable path="Hurtbox"]

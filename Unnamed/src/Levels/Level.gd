@@ -9,5 +9,3 @@ func _ready():
 	
 	if parent is WORLD:
 		parent.current_level = self
-		
-	bonfire.set_active(State.bonfires[name].active)

@@ -18,4 +18,3 @@ func _on_HealArea_body_exited(body):
 func _on_TickTimer_timeout():
 	if ACTIVE:
 		var player = game_instances.player
-		player.heal(HEAL_PER_TICK)
