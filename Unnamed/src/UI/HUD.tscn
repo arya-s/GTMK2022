@@ -9,6 +9,3 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="FireballsPosition" type="Position2D" parent="."]
-position = Vector2( 10, 170 )

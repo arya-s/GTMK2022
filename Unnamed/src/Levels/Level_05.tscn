@@ -1,0 +1,256 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://src/Levels/Level.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/Tilemap/TileMap.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/DicePlatform/DicePlatform3.tscn" type="PackedScene" id=3]
+[ext_resource path="res://src/Spikes/Spikes.tscn" type="PackedScene" id=4]
+[ext_resource path="res://src/DicePlatform/DicePlatform2.tscn" type="PackedScene" id=5]
+[ext_resource path="res://src/DicePlatform/DicePlatform6.tscn" type="PackedScene" id=6]
+[ext_resource path="res://src/LevelTransition/LevelTransition.tscn" type="PackedScene" id=7]
+[ext_resource path="res://src/LevelTransition/level_05__link__level_06.tres" type="Resource" id=8]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 10, 14 )
+
+[node name="Level_05" instance=ExtResource( 1 )]
+level = 4
+
+[node name="Player" parent="." index="1"]
+position = Vector2( 16, 144 )
+
+[node name="InitialSpawnPosition" parent="." index="2"]
+position = Vector2( 16, 144 )
+
+[node name="TileMap" parent="." index="3" instance=ExtResource( 2 )]
+collision_layer = 2
+tile_data = PoolIntArray( -1, 0, 65541, 65535, 0, 65538, 131071, 0, 65538, 196607, 0, 65538, 262143, 0, 65538, 327679, 0, 65538, 262172, 0, 8, 262173, 0, 65547, 262174, 0, 65547, 262175, 0, 65547, 262176, 0, 65547, 262177, 0, 65547, 262178, 0, 65547, 262179, 0, 9, 262182, 0, 8, 262183, 0, 9, 393215, 0, 65538, 327708, 0, 65544, 327709, 0, 65546, 327710, 0, 65546, 327711, 0, 65546, 327712, 0, 65546, 327713, 0, 65546, 327714, 0, 131072, 327715, 0, 11, 327718, 0, 10, 327719, 0, 11, 458751, 0, 65538, 393250, 0, 10, 393251, 0, 196609, 393252, 0, 65547, 393253, 0, 65547, 393254, 0, 196608, 393255, 0, 11, 524287, 0, 65538, 458767, 0, 8, 458768, 0, 65547, 458769, 0, 65547, 458770, 0, 65547, 458771, 0, 65547, 458772, 0, 65547, 458773, 0, 9, 458786, 0, 65544, 458787, 0, 65546, 458788, 0, 65546, 458789, 0, 65546, 458790, 0, 65546, 458791, 0, 65545, 589823, 0, 65538, 524303, 0, 65544, 524304, 0, 65546, 524305, 0, 65546, 524306, 0, 65546, 524307, 0, 65546, 524308, 0, 65546, 524309, 0, 65545, 655359, 0, 65538, 720895, 0, 65538, 786431, 0, 65538, 720910, 0, 8, 720911, 0, 9, 720917, 0, 8, 720918, 0, 9, 851967, 0, 65538, 786446, 0, 10, 786447, 0, 11, 786453, 0, 10, 786454, 0, 11, 917503, 0, 65538, 851982, 0, 10, 851983, 0, 11, 851989, 0, 10, 851990, 0, 11, 983039, 0, 65538, 917518, 0, 65544, 917519, 0, 65545, 917525, 0, 65544, 917526, 0, 65545, 1048575, 0, 65538, 1114111, 0, 65538, 1179647, 0, 65538, 1245183, 0, 131076, 1179648, 0, 65547, 1179649, 0, 65547, 1179650, 0, 65547, 1179651, 0, 65547, 1179652, 0, 9, 1310719, 0, 10, 1245184, 0, 131083, 1245185, 0, 131083, 1245186, 0, 131083, 1245187, 0, 131083, 1245188, 0, 11, 1376255, 0, 10, 1310720, 0, 131083, 1310721, 0, 131083, 1310722, 0, 131083, 1310723, 0, 131083, 1310724, 0, 11, 1441791, 0, 10, 1376256, 0, 131083, 1376257, 0, 131083, 1376258, 0, 131083, 1376259, 0, 131083, 1376260, 0, 11, 1507327, 0, 65544, 1441792, 0, 65546, 1441793, 0, 65546, 1441794, 0, 65546, 1441795, 0, 65546, 1441796, 0, 65545 )
+
+[node name="DicePlatform2" parent="." index="4" instance=ExtResource( 5 )]
+position = Vector2( 56, 88 )
+
+[node name="DicePlatform3" parent="." index="5" instance=ExtResource( 5 )]
+position = Vector2( 216, 92.2096 )
+
+[node name="DicePlatform5" parent="." index="6" instance=ExtResource( 3 )]
+position = Vector2( 140, 100.21 )
+
+[node name="Spikes" parent="." index="7" instance=ExtResource( 4 )]
+position = Vector2( 112, 80 )
+
+[node name="Spikes2" parent="." index="8" instance=ExtResource( 4 )]
+position = Vector2( 120, 80 )
+
+[node name="Spikes3" parent="." index="9" instance=ExtResource( 4 )]
+position = Vector2( 168, 80 )
+
+[node name="Spikes31" parent="." index="10" instance=ExtResource( 4 )]
+position = Vector2( 176, 128 )
+rotation = 3.14159
+
+[node name="Spikes37" parent="." index="11" instance=ExtResource( 4 )]
+position = Vector2( 248, 56 )
+rotation = 3.14159
+
+[node name="Spikes39" parent="." index="12" instance=ExtResource( 4 )]
+position = Vector2( 240, 56 )
+rotation = 3.14159
+
+[node name="Spikes40" parent="." index="13" instance=ExtResource( 4 )]
+position = Vector2( 232, 56 )
+rotation = 3.14159
+
+[node name="Spikes38" parent="." index="14" instance=ExtResource( 4 )]
+position = Vector2( 256, 56 )
+rotation = 3.14159
+
+[node name="Spikes41" parent="." index="15" instance=ExtResource( 4 )]
+position = Vector2( 264, 56 )
+rotation = 3.14159
+
+[node name="Spikes42" parent="." index="16" instance=ExtResource( 4 )]
+position = Vector2( 272, 56 )
+rotation = 3.14159
+
+[node name="Spikes32" parent="." index="17" instance=ExtResource( 4 )]
+position = Vector2( 184, 128 )
+rotation = 3.14159
+
+[node name="Spikes33" parent="." index="18" instance=ExtResource( 4 )]
+position = Vector2( 120, 128 )
+rotation = 3.14159
+
+[node name="Spikes34" parent="." index="19" instance=ExtResource( 4 )]
+position = Vector2( 128, 128 )
+rotation = 3.14159
+
+[node name="Spikes4" parent="." index="20" instance=ExtResource( 4 )]
+position = Vector2( 176, 80 )
+
+[node name="Spikes5" parent="." index="21" instance=ExtResource( 4 )]
+position = Vector2( 216, 84.2096 )
+
+[node name="Spikes12" parent="." index="22" instance=ExtResource( 4 )]
+position = Vector2( 64, 80 )
+
+[node name="Spikes13" parent="." index="23" instance=ExtResource( 4 )]
+position = Vector2( 56, 80 )
+
+[node name="Spikes6" parent="." index="24" instance=ExtResource( 4 )]
+position = Vector2( 224, 84 )
+
+[node name="Spikes7" parent="." index="25" instance=ExtResource( 4 )]
+position = Vector2( 136, 88 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes11" parent="." index="26" instance=ExtResource( 4 )]
+position = Vector2( 240, 92.2096 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes18" parent="." index="27" instance=ExtResource( 4 )]
+position = Vector2( 240, 92.2096 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes19" parent="." index="28" instance=ExtResource( 4 )]
+position = Vector2( 240, 100.21 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes20" parent="." index="29" instance=ExtResource( 4 )]
+position = Vector2( 80, 88 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes25" parent="." index="30" instance=ExtResource( 4 )]
+position = Vector2( 80, 96 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes8" parent="." index="31" instance=ExtResource( 4 )]
+position = Vector2( 136, 96 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes9" parent="." index="32" instance=ExtResource( 4 )]
+position = Vector2( 136, 104 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes10" parent="." index="33" instance=ExtResource( 4 )]
+position = Vector2( 136, 112 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes14" parent="." index="34" instance=ExtResource( 4 )]
+position = Vector2( 192, 88 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes15" parent="." index="35" instance=ExtResource( 4 )]
+position = Vector2( 192, 96 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes16" parent="." index="36" instance=ExtResource( 4 )]
+position = Vector2( 192, 104 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes17" parent="." index="37" instance=ExtResource( 4 )]
+position = Vector2( 192, 112 )
+rotation = 1.57079
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes21" parent="." index="38" instance=ExtResource( 4 )]
+position = Vector2( 104, 120 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes22" parent="." index="39" instance=ExtResource( 4 )]
+position = Vector2( 104, 112 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes23" parent="." index="40" instance=ExtResource( 4 )]
+position = Vector2( 104, 104 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes24" parent="." index="41" instance=ExtResource( 4 )]
+position = Vector2( 104, 96 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes26" parent="." index="42" instance=ExtResource( 4 )]
+position = Vector2( 160, 96 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes36" parent="." index="43" instance=ExtResource( 4 )]
+position = Vector2( 216, 48 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes43" parent="." index="44" instance=ExtResource( 4 )]
+position = Vector2( 216, 40 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes27" parent="." index="45" instance=ExtResource( 4 )]
+position = Vector2( 160, 104 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes28" parent="." index="46" instance=ExtResource( 4 )]
+position = Vector2( 160, 112 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="Spikes29" parent="." index="47" instance=ExtResource( 4 )]
+position = Vector2( 160, 120 )
+rotation = 4.71238
+collision_layer = 0
+collision_mask = 4
+
+[node name="DicePlatform6" parent="." index="48" instance=ExtResource( 6 )]
+position = Vector2( 288, 32 )
+
+[node name="LevelTransition" parent="." index="49" instance=ExtResource( 7 )]
+position = Vector2( 592, 40 )
+next_level = "res://src/Levels/Level_06.tscn"
+connection = ExtResource( 8 )
+max_jump = 6
+
+[node name="Collider" parent="LevelTransition" index="0"]
+position = Vector2( -296, -16 )
+rotation = -0.0105783
+shape = SubResource( 1 )
+
+[node name="ExitPosition" parent="LevelTransition" index="1"]
+position = Vector2( -296, -8.00001 )
+
+[editable path="LevelTransition"]

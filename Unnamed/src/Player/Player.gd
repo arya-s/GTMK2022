@@ -42,6 +42,9 @@ var player_stats = GameResourceLoader.player_stats
 var variable_jump_speed = 0
 var wall_speed_retained = 0
 
+export(int) var max_jump = 1
+export(int) var jump_buffer = 1
+
 var form = -1
 var char_form = 0
 var boost_jumped = false
@@ -61,6 +64,7 @@ onready var right_wall_ray_cast = $RightWallRayCast
 onready var sprite = $Sprite
 onready var variable_jump_timer = $VariableJumpTimer
 onready var change_form_timer = $ChangeFormTimer
+onready var animator = $AnimationPlayer
 
 signal touched_level_transition(level_transition)
 signal boss_died
@@ -86,6 +90,9 @@ func _ready():
 		global_position = State.player_spawn_point
 		
 	facing = State.player_spawm_facing
+	max_jump = State.player_spawn_max_jump
+	jump_buffer = max_jump
+	sprite.frame = max_jump - 1
 
 func _physics_process(delta):
 	just_jumped = false
@@ -117,7 +124,7 @@ func animate_hit():
 
 func apply_gravity(delta: float):
 	max_fall = move_toward(max_fall, MAX_FALL, FAST_MAX_ACCEL * delta)
-	var mult = 0.5 if abs(motion.y) < HALF_GRAVITY_THRESHOLD and not boost_jumped and Input.is_action_pressed("jump") else 1.0
+	var mult = 0.5 if abs(motion.y) < HALF_GRAVITY_THRESHOLD and (Input.is_action_pressed("jump") or boost_jumped) else 1.0
 	motion.y = move_toward(motion.y, max_fall, GRAVITY * mult * delta)
 	
 	if (variable_jump_timer.time_left > 0):
@@ -135,6 +142,7 @@ func apply_horizontal_force(input_vector: Vector2, delta: float):
 		motion.x = move_toward(motion.x, input_vector.x * MAX_SPEED, ACCELERATION * mult * delta)
 
 func die():	
+	player_stats.incremenet_deaths()
 	Global.play_player_dying_sound()
 	Controls.rumble_gamepad(Controls.RumbleStrength.Strong, Controls.RumbleLength.Short)
 	
@@ -142,11 +150,7 @@ func die():
 	State.ignored_level_transition = null
 	State.level_connection = null
 	
-	if State.last_bonfire == null:
-		Utils.change_scene(State.starting_level)
-	else:
-		var level = State.bonfires[State.last_bonfire].level
-		Utils.change_scene(level)
+	Utils.change_scene(State.current_level)
 
 func freeup_fireball():
 	player_stats.fireballs -= 1
@@ -158,24 +162,28 @@ func get_input_vector():
 	return input_vector
 
 func handle_additional_input():
-	if Input.is_action_just_pressed("change_form"):
-		change_form_timer.start()
-		form = (form + 1) % 3
-		char_form = form
-		sprite.frame = char_form
+	pass
+#	if Input.is_action_just_pressed("change_form"):
+#		change_form_timer.start()
+#		form = (form + 1) % 3
+#		char_form = form
+#		sprite.frame = char_form
 		
 
 func handle_collisions(input_vector: Vector2):
+	var dice_value = get_collided_dice_value()
+	if dice_value != null:
+		max_jump = dice_value
+		jump_buffer = dice_value
+		sprite.frame = dice_value - 1
 	# Relies on speicifically using move_and_slide or mmove_and_slide_with_snap
 #	for i in get_slide_count():
 #		var collider = get_slide_collision(i).collider
 #		var groups = collider.get_groups()
-	var plat = get_collided_platform()
-
-	if plat == char_form and not was_on_floor and is_on_floor():
-		jump(input_vector, JUMP_FORCE*4, JUMP_HORIZONTAL_BOOST*2.5)
-		boost_jumped = true
-		just_jumped = true
+#	if get_collided_jump_platform() == char_form and not was_on_floor and is_on_floor():
+#		jump(input_vector, JUMP_FORCE*3.5, JUMP_HORIZONTAL_BOOST*2)
+#		boost_jumped = true
+#		just_jumped = true
 
 func jump(input_vector: Vector2, force: int, horizontal_force: int):
 	variable_jump_timer.start()
@@ -186,21 +194,28 @@ func jump(input_vector: Vector2, force: int, horizontal_force: int):
 	jump_sound.play()
 	
 func jump_check(input_vector: Vector2):
-	if boost_jumped:
+	# if max_jump > 0 and near wall: allow jumps regardless of jump_buffer
+	# jump buffer should never 
+	if max_jump < 1:
 		return
-
+	
 	if Input.is_action_just_pressed("jump"):
-		if is_on_floor() or coyote_jump_timer.time_left > 0:
-			jump(input_vector, JUMP_FORCE, JUMP_HORIZONTAL_BOOST)
-			just_jumped = true
-		else:
+		if not is_on_floor():
 			if wall_jump_check(RIGHT):
 				wall_jump(LEFT, JUMP_FORCE)
 				just_jumped = true
 			elif wall_jump_check(LEFT):
 				wall_jump(RIGHT, JUMP_FORCE)
 				just_jumped = true
-	elif Input.is_action_just_released("jump") and motion.y < -JUMP_FORCE / 2.0:
+			elif jump_buffer >= 1 or coyote_jump_timer.time_left > 0:
+				jump(input_vector, JUMP_FORCE, JUMP_HORIZONTAL_BOOST)
+				just_jumped = true
+				jump_buffer -= 1
+		else:
+			jump(input_vector, JUMP_FORCE, JUMP_HORIZONTAL_BOOST)
+			just_jumped = true
+			jump_buffer -= 1
+	elif jump_buffer > 0 and Input.is_action_just_released("jump") and motion.y < -JUMP_FORCE / 2.0:
 		motion.y = -JUMP_FORCE / 2.0
 
 func move():
@@ -215,6 +230,7 @@ func move():
 
 	# landing
 	if was_in_air and is_on_floor():
+		jump_buffer = max_jump
 		Controls.rumble_gamepad(Controls.RumbleStrength.Light, Controls.RumbleLength.VeryShort)
 	
 	# just left ground
@@ -223,6 +239,8 @@ func move():
 		coyote_jump_timer.start()
 
 func reset():
+	sprite.frame = max_jump - 1
+	char_form = max_jump
 	hit_animation_player.stop()
 	invincible = false
 
@@ -232,21 +250,66 @@ func set_invincible(value: bool):
 func update_animations(input_vector: Vector2):
 	sprite.scale.x = facing
 	if input_vector.x != 0:
-		pass
-		#animate("run")
+		if jump_buffer == 6:
+			animator.play("Run6")
+		elif jump_buffer == 5:
+			animator.play("Run5")
+		elif jump_buffer == 4:
+			animator.play("Run4")
+		elif jump_buffer == 3:
+			animator.play("Run3")
+		elif jump_buffer == 2:
+			animator.play("Run2")
+		elif jump_buffer == 1:
+			animator.play("Run1")
+		elif jump_buffer == 0:
+			animator.play("Run0")
+		else:
+			animator.play("Run0")
 	else:
 		# idle
-		pass
+		if jump_buffer == 6:
+			animator.play("Idle6")
+		elif jump_buffer == 5:
+			animator.play("Idle5")
+		elif jump_buffer == 4:
+			animator.play("Idle4")
+		elif jump_buffer == 3:
+			animator.play("Idle3")
+		elif jump_buffer == 2:
+			animator.play("Idle2")
+		elif jump_buffer == 1:
+			animator.play("Idle1")
+		elif jump_buffer == 0:
+			animator.play("Idle0")
+		else:
+			animator.play("Idle0")
 		
 	# air
 	if not is_on_floor():
-		var orientation = sign(motion.y)
-		if orientation == -1:
-			#animate("jump")
-			pass
+		if jump_buffer == 6:
+			animator.play("Jump6")
+		elif jump_buffer == 5:
+			animator.play("Jump5")
+		elif jump_buffer == 4:
+			animator.play("Jump4")
+		elif jump_buffer == 3:
+			animator.play("Jump3")
+		elif jump_buffer == 2:
+			animator.play("Jump2")
+		elif jump_buffer == 1:
+			animator.play("Jump1")
+		elif jump_buffer == 0:
+			animator.play("Jump0")
 		else:
-			pass
-			#animate("fall")	
+			animator.play("Jump0")
+#		var orientation = sign(motion.y)
+#		if orientation == -1:
+#			#animate("jump")
+#			pass
+#		else:
+#			pass
+#			#animate("fall")	
 
 func update_camera(room):
 	var collider = room.get_node("Collider")
@@ -292,10 +355,6 @@ func knockback(direction):
 	var knockback_motion = (direction * KNOCKBACK_FORCE).rotated(deg2rad(45 if direction.x < 0 else 325))
 	knockback_motion.y = min(knockback_motion.y, -200)
 	motion = knockback_motion
-	debug_ray.cast_to = knockback_motion
-
-func _on_Hurtbox_hit(damage, attacker):
-	pass
 
 func _on_RoomDetectorLeft_area_entered(room: Area2D):
 	update_camera(room)
@@ -305,15 +364,14 @@ func _on_RoomDetectorRight_area_entered(room: Area2D):
 
 func _on_ChangeFormTimer_timeout():
 	form = -1
-	
-func get_collided_platform():
+
+func get_collided_dice_value():
 	for i in range(get_slide_count()):
-		var collision = get_slide_collision(i)
-		if collision.collider.is_in_group('jump_platforms'):
-			if collision.collider.is_in_group('plat_1'):
-				return 0
-			if collision.collider.is_in_group('plat_2'):
-				return 1
-			if collision.collider.is_in_group('plat_3'):
-				return 2
+		var collider = get_slide_collision(i).collider
+		if collider.is_in_group('dice'):
+			return collider.type
 	return null
+
+func _on_Hurtbox_hit(damage, attacker):
+	if damage > 0:
+		die()

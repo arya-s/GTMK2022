@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://src/Platform/Platform.gd" type="Script" id=1]
+
+[node name="Platform" type="StaticBody2D" groups=[
+"jump_platforms",
+]]
+collision_layer = 3
+collision_mask = 3
+script = ExtResource( 1 )

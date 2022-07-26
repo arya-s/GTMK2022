@@ -7,6 +7,12 @@ func instance_scene_on_main(scene, position):
 	instance.global_position = position
 	return instance
 
+func add_instance_on_main(instance, position):
+	var main = get_tree().current_scene
+	main.add_child(instance)
+	instance.global_position = position
+	return instance
+
 func change_scene(next):
 	get_tree().change_scene(next)
 

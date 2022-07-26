@@ -1,11 +1,12 @@
 extends Node
 
-const WORLD = preload("res://src/World/World.gd")
+onready var initial_spawn_position = $InitialSpawnPosition
 
-onready var bonfire = $Bonfire
+var player_stats = GameResourceLoader.player_stats
+
+export(int) var level = 0
 
 func _ready():
-	var parent = get_parent()
-	
-	if parent is WORLD:
-		parent.current_level = self
+	player_stats.current_level = level
+	State.current_level = self.filename
+	State.player_spawn_point = initial_spawn_position.global_position

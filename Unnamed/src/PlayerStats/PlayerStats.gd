@@ -20,6 +20,9 @@ var active_bonfires = {
 var health = STARTING_HEALTH setget set_health
 var fireballs = 0 setget set_fireballs
 
+var deaths_by_level = [0, 0, 0, 0, 0, 0, 0]
+var current_level = 0
+
 signal player_died
 
 func set_health(value):
@@ -34,3 +37,9 @@ func set_fireballs(value):
 func reset_player_stats():
 	set_health(STARTING_HEALTH)
 	set_fireballs(0)
+	
+func incremenet_deaths():
+	deaths_by_level[current_level] += 1
+	
+func get_deaths_for_level(level):
+	return deaths_by_level[level]
