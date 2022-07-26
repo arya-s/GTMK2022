@@ -341,12 +341,15 @@ func wall_jump(dir: int, force: int):
 	jump_sound.play()
 	
 func wall_jump_check(dir: int):
+	var collider: Object = null
 	if dir == LEFT:
-		return left_wall_ray_cast.is_colliding()
+		if left_wall_ray_cast.is_colliding():
+			collider = left_wall_ray_cast.get_collider()
 	elif dir == RIGHT:
-			return right_wall_ray_cast.is_colliding()
+		if right_wall_ray_cast.is_colliding():
+			collider = right_wall_ray_cast.get_collider()
 	
-	return false
+	return collider != null && !collider.is_in_group("level_boundaries")
 
 func _on_died():
 	die()
