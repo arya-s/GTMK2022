@@ -250,57 +250,21 @@ func set_invincible(value: bool):
 func update_animations(input_vector: Vector2):
 	sprite.scale.x = facing
 	if input_vector.x != 0:
-		if jump_buffer == 6:
-			animator.play("Run6")
-		elif jump_buffer == 5:
-			animator.play("Run5")
-		elif jump_buffer == 4:
-			animator.play("Run4")
-		elif jump_buffer == 3:
-			animator.play("Run3")
-		elif jump_buffer == 2:
-			animator.play("Run2")
-		elif jump_buffer == 1:
-			animator.play("Run1")
-		elif jump_buffer == 0:
-			animator.play("Run0")
+		if jump_buffer >= 0 and jump_buffer <=6:
+			animator.play("Run{buffer}".format({"buffer": jump_buffer}))
 		else:
 			animator.play("Run0")
 	else:
 		# idle
-		if jump_buffer == 6:
-			animator.play("Idle6")
-		elif jump_buffer == 5:
-			animator.play("Idle5")
-		elif jump_buffer == 4:
-			animator.play("Idle4")
-		elif jump_buffer == 3:
-			animator.play("Idle3")
-		elif jump_buffer == 2:
-			animator.play("Idle2")
-		elif jump_buffer == 1:
-			animator.play("Idle1")
-		elif jump_buffer == 0:
-			animator.play("Idle0")
+		if jump_buffer >= 0 and jump_buffer <= 6:
+			animator.play("Idle{buffer}".format({"buffer": jump_buffer}))
 		else:
 			animator.play("Idle0")
 		
 	# air
 	if not is_on_floor():
-		if jump_buffer == 6:
-			animator.play("Jump6")
-		elif jump_buffer == 5:
-			animator.play("Jump5")
-		elif jump_buffer == 4:
-			animator.play("Jump4")
-		elif jump_buffer == 3:
-			animator.play("Jump3")
-		elif jump_buffer == 2:
-			animator.play("Jump2")
-		elif jump_buffer == 1:
-			animator.play("Jump1")
-		elif jump_buffer == 0:
-			animator.play("Jump0")
+		if jump_buffer >= 0 and jump_buffer <= 6:
+			animator.play("Jump{buffer}".format({"buffer": jump_buffer}))
 		else:
 			animator.play("Jump0")
 #		var orientation = sign(motion.y)
@@ -349,6 +313,13 @@ func wall_jump_check(dir: int):
 		if right_wall_ray_cast.is_colliding():
 			collider = right_wall_ray_cast.get_collider()
 	
+	# Consume dices here so that we also gain them even if further away
+	if collider and collider.is_in_group("dice"):
+		var dice_value = collider.type
+		max_jump = dice_value
+		jump_buffer = dice_value
+		sprite.frame = dice_value - 1
+
 	return collider != null && !collider.is_in_group("level_boundaries")
 
 func _on_died():

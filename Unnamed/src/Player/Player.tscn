@@ -440,12 +440,12 @@ tracks/0/keys = {
 "values": [ 31, 32, 33, 34 ]
 }
 
-[node name="Player" type="KinematicBody2D" groups=[
-"player",
-]]
+[node name="Player" type="KinematicBody2D" groups=["player"]]
 script = ExtResource( 2 )
 
 [node name="Camera" parent="." instance=ExtResource( 6 )]
+limit_smoothed = false
+smoothing_enabled = false
 
 [node name="DebugLabel" type="Label" parent="."]
 margin_left = -20.106
@@ -456,9 +456,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Collider" type="CollisionShape2D" parent="." groups=[
-"player",
-]]
+[node name="Collider" type="CollisionShape2D" parent="." groups=["player"]]
 position = Vector2( 0, -7 )
 shape = SubResource( 1 )
 
